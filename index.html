@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>College Bus Booking System</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    :root {
+      --primary-color: #004080;
+      --accent-color: #007bff;
+      --bg-color: #f4f4f4;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg-color);
+    }
+
+    header {
+      background: var(--primary-color);
+      color: #fff;
+      padding: 15px;
+      text-align: center;
+    }
+
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      background-color: var(--accent-color);
+    }
+
+    nav button {
+      background: none;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    nav button:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .container {
+      padding: 20px;
+    }
+
+    .section {
+      display: none;
+      background: white;
+      padding: 20px;
+      margin-top: 20px;
+      border-radius: 8px;
+    }
+
+    input, button, select {
+      padding: 10px;
+      margin: 10px 0;
+      width: 100%;
+    }
+
+    .seat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+      gap: 10px;
+    }
+
+    .seat {
+      background: #ccc;
+      text-align: center;
+      padding: 10px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .seat.selected {
+      background: green;
+      color: white;
+    }
+
+    #map {
+      height: 300px;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    img.qr {
+      margin-top: 15px;
+      width: 120px;
+    }
+
+    @media (max-width: 600px) {
+      nav button {
+        flex: 1 1 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>College Bus Booking</h1>
+  </header>
+  <nav>
+    <button onclick="show('login')">Login</button>
+    <button onclick="show('signup')">Signup</button>
+    <button onclick="show('booking')">Booking</button>
+    <button onclick="show('history')">History</button>
+    <button onclick="show('admin')">Admin</button>
+    <button onclick="show('map')">Map</button>
+  </nav>
+  <div class="container">
+    <div class="section" id="login">
+      <h2>Login</h2>
+      <input type="email" placeholder="Email">
+      <input type="password" placeholder="Password">
+      <button onclick="alert('Login successful (dummy)')">Login</button>
+    </div>
+
+    <div class="section" id="signup">
+      <h2>Signup</h2>
+      <input type="text" placeholder="Name">
+      <input type="email" placeholder="Email">
+      <input type="password" placeholder="Password">
+      <button onclick="alert('Signup successful (dummy)')">Signup</button>
+    </div>
+
+    <div class="section" id="booking">
+      <h2>Book Seat</h2>
+      <div class="seat-grid" id="seatContainer"></div>
+      <button onclick="generateQR()">Generate Ticket</button>
+      <img id="qrCode" class="qr" />
+    </div>
+
+    <div class="section" id="history">
+      <h2>Booking History</h2>
+      <ul>
+        <li>City Campus → Main Hub, Seat 5, 21 Jul 2025</li>
+        <li>Main Hub → Hostel, Seat 7, 20 Jul 2025</li>
+      </ul>
+    </div>
+
+    <div class="section" id="admin">
+      <h2>Admin Panel</h2>
+      <p>Manage buses and view logs (dummy)</p>
+      <input placeholder="Bus route name">
+      <button onclick="alert('Bus route added (dummy)')">Add Route</button>
+    </div>
+
+    <div class="section" id="map">
+      <h2>Route Map</h2>
+      <div id="map"></div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    function show(id) {
+      document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+      document.getElementById(id).style.display = 'block';
+      if (id === 'booking') createSeats();
+      if (id === 'map') loadMap();
+    }
+
+    function createSeats() {
+      const container = document.getElementById('seatContainer');
+      container.innerHTML = '';
+      for (let i = 1; i <= 20; i++) {
+        const seat = document.createElement('div');
+        seat.className = 'seat';
+        seat.innerText = 'S' + i;
+        seat.onclick = () => seat.classList.toggle('selected');
+        container.appendChild(seat);
+      }
+    }
+
+    function generateQR() {
+      const qr = document.getElementById('qrCode');
+      qr.src = 'https://api.qrserver.com/v1/create-qr-code/?data=BusTicket_' + Date.now() + '&size=150x150';
+    }
+
+    let mapInitialized = false;
+    function loadMap() {
+      if (mapInitialized) return;
+      const map = L.map('map').setView([22.9734, 78.6569], 5);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18
+      }).addTo(map);
+      mapInitialized = true;
+    }
+
+    show('login');
+  </script>
+</body>
+</html>
